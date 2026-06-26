@@ -15,10 +15,9 @@
 - [ ] Record OOF + LB
 
 ## Phase 3 — QLoRA via mineral-hr-llm (v0.2)
-- [ ] Check out msusol/mineral-hr-llm on sparkdb62; build Dockerfile.gb10
 - [ ] `scripts/convert_to_jsonl.py`: Kaggle CSV → {id,instruction,context,output} + A/B swap aug
-- [ ] v0.2a: train Llama-3.1-8B with run_train.sh (label-token readout); OOF log loss
-- [ ] v0.2b: repoint --model_name to local gemma-2-9b-it; compare OOF
+- [ ] v0.2a (Kaggle T4×2): train Llama-3.1-8B LoRA in Kaggle notebook (internet on); validate pipeline end-to-end; submit directly
+- [ ] v0.2b (DGX Spark): scale on GB10 (Gemma-2-9b or more epochs); push adapter to HF → Kaggle Models → offline submission
 - [ ] Package offline (base + adapter + source-built bitsandbytes) with swap-TTA inference
 - [ ] Submit; update leaderboard.md
 
