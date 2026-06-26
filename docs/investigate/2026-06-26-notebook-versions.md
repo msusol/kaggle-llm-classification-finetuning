@@ -22,7 +22,7 @@ log loss of 1.0986.
 - [x] Notebook runs end-to-end on Kaggle (no import errors)
 - [x] Competition data mounts correctly under `/kaggle/input/`
 - [x] `submission.csv` written with correct header and row count
-- [ ] LB score recorded in leaderboard.md
+- [x] LB score recorded in leaderboard.md — **1.04157**
 
 ### Findings
 
@@ -57,8 +57,8 @@ User accepted rules under `gdataranger`. v3 run succeeded.
 
 ### Resolution
 
-`partially resolved` — notebook runs cleanly; awaiting LB score from competition
-submission of the v3 output.
+`resolved` — notebook runs cleanly; LB score 1.04157 confirmed (CV 1.0404 ≈ LB,
+near-perfect correlation, pipeline validated end-to-end).
 
 ### Follow-ups
 
@@ -68,10 +68,10 @@ submission of the v3 output.
 
 ---
 
-## v0.2-llama-qlora (planned)
+## v0.2-llama-qlora
 
-**Kernel id:** `gdataranger/llm-classification-finetuning-v02-qlora` _(not yet created)_
-**Notebook file:** `notebook/v0.2-llama-qlora.ipynb` _(not yet created)_
+**Kernel id:** `gdataranger/llm-classification-finetuning-v02-qlora`
+**Notebook file:** `notebook/v0.2-llama-qlora.ipynb`
 **GPU:** T4×2 | **Internet:** on (training run) / off (scoring run)
 
 ### Context

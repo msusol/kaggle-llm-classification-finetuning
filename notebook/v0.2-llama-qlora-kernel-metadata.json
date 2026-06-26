@@ -1,0 +1,15 @@
+{
+  "id": "gdataranger/llm-classification-finetuning-v02-qlora",
+  "title": "LLM Classification Finetuning — v0.2 Llama LoRA",
+  "code_file": "v0.2-llama-qlora.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": true,
+  "dataset_sources": [],
+  "competition_sources": [
+    "llm-classification-finetuning"
+  ],
+  "model_sources": []
+}
