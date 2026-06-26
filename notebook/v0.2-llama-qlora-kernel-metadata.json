@@ -1,5 +1,5 @@
 {
-  "id": "gdataranger/llm-classification-finetuning-v02-qlora",
+  "id": "gdataranger/llm-classification-finetuning-v0-2-llama-lora",
   "title": "LLM Classification Finetuning — v0.2 Llama LoRA",
   "code_file": "v0.2-llama-qlora.ipynb",
   "language": "python",
