@@ -29,6 +29,21 @@ source in `docs/plans/CITATIONS.md`. Never reuse a number.
 - Submission file is exactly `submission.csv` with header
   `id,winner_model_a,winner_model_b,winner_tie`.
 
+## Notebook versioning
+
+Each competition phase / modelling method gets its own notebook pair in `notebook/`:
+
+```
+notebook/vX.Y-<slug>.ipynb
+notebook/vX.Y-<slug>-kernel-metadata.json
+```
+
+The slug matches the versioned plan (`docs/plans/vX.Y-<slug>-plan.md`). Never overwrite
+a prior notebook. Push via `zsh scripts/push_notebook.sh vX.Y-<slug>`.
+
+Track every run (errors, fixes, results) in `docs/investigate/YYYY-MM-DD-notebook-versions.md`
+— one `##` section per slug.
+
 ## DGX Spark training rules
 
 - Train on `sparkdb62` (GB10). Always run long jobs under `tmux`; never background a

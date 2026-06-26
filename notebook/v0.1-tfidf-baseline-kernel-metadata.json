@@ -1,7 +1,7 @@
 {
-  "id": "gdataranger/llm-classification-finetuning-submission",
-  "title": "LLM Classification Finetuning — Submission",
-  "code_file": "submission.ipynb",
+  "id": "gdataranger/llm-classification-finetuning-v01-tfidf",
+  "title": "LLM Classification Finetuning — v0.1 TF-IDF Baseline",
+  "code_file": "v0.1-tfidf-baseline.ipynb",
   "language": "python",
   "kernel_type": "notebook",
   "is_private": true,
