@@ -14,11 +14,12 @@
 - [ ] 3-class cross-encoder; confirm < 9 h inference
 - [ ] Record OOF + LB
 
-## Phase 3 — Gemma-2-9b QLoRA (v0.2)
-- [ ] Fork mineral-hr-llm LoRA harness on sparkdb62 → seq-classification head (3 labels)
-- [ ] A/B swap augmentation + tail truncation
-- [ ] 5-fold train on GB10; select by OOF log loss
-- [ ] Package offline (base + adapter + wheels) with swap-TTA inference
+## Phase 3 — QLoRA via mineral-hr-llm (v0.2)
+- [ ] Check out msusol/mineral-hr-llm on sparkdb62; build Dockerfile.gb10
+- [ ] `scripts/convert_to_jsonl.py`: Kaggle CSV → {id,instruction,context,output} + A/B swap aug
+- [ ] v0.2a: train Llama-3.1-8B with run_train.sh (label-token readout); OOF log loss
+- [ ] v0.2b: repoint --model_name to local gemma-2-9b-it; compare OOF
+- [ ] Package offline (base + adapter + source-built bitsandbytes) with swap-TTA inference
 - [ ] Submit; update leaderboard.md
 
 ## Phase 4 — Squeeze

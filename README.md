@@ -34,8 +34,9 @@ This is a **Code Competition**. The notebook must satisfy:
 
 ## Hardware
 
-Training on **NVIDIA DGX Spark (GB10)** — reuse the working LoRA/PEFT setup from
-`mineral-hr-llm` on `sparkdb62`. See
+Training on **NVIDIA DGX Spark (GB10)** by reusing the verified LoRA/QLoRA harness in
+[`msusol/mineral-hr-llm`](https://github.com/msusol/mineral-hr-llm) on `sparkdb62`
+(`train_hr_lora.py`, `Dockerfile.gb10`, `--use_qlora`, `--local_files_only`). See
 [docs/plans/v0.2-gemma-qlora-plan.md](docs/plans/v0.2-gemma-qlora-plan.md).
 
 ## Data
