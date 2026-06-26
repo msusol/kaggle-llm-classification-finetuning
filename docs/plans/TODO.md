@@ -1,14 +1,14 @@
 # TODO
 
 ## Phase 0 — Setup
-- [ ] Place `~/.kaggle/kaggle.json`; accept competition rules on the website
-- [ ] `bash scripts/download_data.sh` → data/train.csv, test.csv, sample_submission.csv
-- [ ] Confirm uniform submission scores ≈ 1.0986 (sanity)
+- [x] Place `~/.kaggle/kaggle.json`; accept competition rules on the website
+- [x] `bash scripts/download_data.sh` → data/train.csv, test.csv, sample_submission.csv
+- [x] Confirm uniform submission scores ≈ 1.0986 (sanity)
 
 ## Phase 1 — Baseline (v0.1)
 - [ ] EDA: class balance, length distributions, position-bias check
-- [ ] TF-IDF + length features → LightGBM 5-fold
-- [ ] First offline submission; record CV/LB in leaderboard.md
+- [x] TF-IDF + length features → LightGBM 5-fold (OOF 1.0404)
+- [ ] Build Kaggle notebook for baseline inference → `kaggle kernels push` → record LB
 
 ## Phase 2 — DeBERTa-v3 (v0.x, optional checkpoint)
 - [ ] 3-class cross-encoder; confirm < 9 h inference

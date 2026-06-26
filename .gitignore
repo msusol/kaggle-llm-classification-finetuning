@@ -19,6 +19,9 @@ data/*.jsonl
 data/folds/
 data/features/
 
+# Logs
+logs/
+
 # Model artifacts
 adapters/**/*.safetensors
 adapters/**/*.bin
