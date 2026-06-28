@@ -1,0 +1,15 @@
+{
+  "id": "gdataranger/llm-classification-finetuning-v0-0-eda",
+  "title": "LLM Classification Finetuning — v0.0 EDA",
+  "code_file": "v0.0-eda.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": false,
+  "enable_internet": true,
+  "dataset_sources": [],
+  "competition_sources": [
+    "llm-classification-finetuning"
+  ],
+  "model_sources": []
+}

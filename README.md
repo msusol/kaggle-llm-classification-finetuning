@@ -18,8 +18,70 @@ writes `submission.csv`.
 | Item | Value |
 |---|---|
 | Baseline to beat (uniform 0.333) | log loss ≈ **1.0986** (ln 3) |
-| Current best | _none yet — see [docs/plans/leaderboard.md](docs/plans/leaderboard.md)_ |
-| Target tier | top public solutions ~0.89–0.92 (Gemma-2-9b QLoRA) |
+| v0.1 TF-IDF + LightGBM | **1.04157** (LB) |
+| v0.2 Llama-3.2-3B LoRA | _in progress_ |
+| Target tier | top public solutions ~0.89–0.92 |
+
+## Phases
+
+### What each version does
+
+| Version | Notebook | Technique | PEFT? | Notes |
+|---|---|---|---|---|
+| v0.1 | `v0.1-tfidf-baseline` | TF-IDF + LightGBM | No | CPU only; locks the submission pipeline |
+| v0.2 | `v0.2-llama-qlora` | Llama-3.2-3B SFT + LoRA | Yes | Single-fold validation run on Kaggle T4 |
+
+### What PEFT/LoRA means here
+
+**PEFT** (Parameter-Efficient Fine-Tuning) via **LoRA** means we inject small trainable
+adapter matrices into the frozen base model's attention layers and train only those
+(~24M of 3.2B params, < 1%). The base model weights never change.
+
+This is **not** teacher/student / knowledge distillation. There is no second "teacher"
+model. We fine-tune Llama-3.2-3B directly on the human preference labels from
+`train.csv`. At inference, instead of generating text, we read the model's logits at
+the final token position for the tokens `A`, `B`, and `tie` and softmax them into
+3-class probabilities.
+
+### Ensemble strategy (DeBERTa optional)
+
+The original plan included a DeBERTa-v3-large rung between the baseline and the LLM.
+DeBERTa is optional — the ensemble still works without it:
+
+**Without DeBERTa:**
+- Average predictions across all 5 LoRA folds (same architecture, different held-out
+  fold each time) — the primary diversity signal
+- Optionally add a second model size (e.g. Llama-3.1-8B) if quota allows
+- Swap-TTA is already baked into every fold (average forward + swapped predictions)
+
+**With DeBERTa (stronger):**
+- DeBERTa fold-ensemble + Llama fold-ensemble, weighted average
+- DeBERTa converges faster and gives a different inductive bias (cross-encoder vs.
+  generative label readout), so ensembling the two is worth ~0.01–0.02 log loss
+
+The LLM fold-ensemble alone is sufficient to reach the top tier.
+
+**True distillation (< 0.82 target):**
+
+The winning approach [cite:2] used **knowledge distillation**, which is distinct from
+what v0.2 does:
+
+- **Teacher:** a frozen 70B model runs inference over the full training set and
+  produces soft probability distributions (not hard A/B/tie labels).
+- **Student:** per-fold Gemma-2-9b fine-tuned via LoRA to match those soft targets
+  (KL-divergence loss against the teacher's output, not cross-entropy against the
+  human labels).
+- **Weight averaging:** the per-fold LoRA adapters are averaged before submission.
+
+This is PEFT on the student side — the teacher is never trained, only used for
+inference. The student learns a richer signal (the teacher's uncertainty over all three
+classes) than the binary human vote alone provides. This is what separates the ~0.89
+tier (SFT on hard labels) from the < 0.82 tier (distillation from a 70B teacher).
+
+A distillation phase (v0.3 or v0.4) would require:
+1. Running 70B inference over the full training set (DGX Spark, offline batch)
+2. Saving soft targets as a dataset
+3. Swapping the SFT loss for KL-divergence against those targets
 
 ## Evaluator constraints
 

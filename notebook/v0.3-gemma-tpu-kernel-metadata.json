@@ -1,7 +1,7 @@
 {
-  "id": "gdataranger/llm-classification-finetuning-v0-2-llama-lora",
-  "title": "LLM Classification Finetuning — v0.2 Llama LoRA",
-  "code_file": "v0.2-llama-qlora.ipynb",
+  "id": "gdataranger/llm-classification-finetuning-v0-3-gemma-tpu",
+  "title": "LLM Classification Finetuning — v0.3 Gemma-2-9b TPU",
+  "code_file": "v0.3-gemma-tpu.ipynb",
   "language": "python",
   "kernel_type": "notebook",
   "is_private": true,
@@ -12,6 +12,6 @@
     "llm-classification-finetuning"
   ],
   "model_sources": [
-    "metaresearch/llama-3.2/transformers/3b-instruct/1"
+    "google/gemma-2/transformers/gemma-2-9b-it/1"
   ]
 }

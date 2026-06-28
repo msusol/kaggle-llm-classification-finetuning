@@ -32,14 +32,86 @@ LoRA weights.[cite:2]
 - Fits comfortably in 9 h; good checkpoint before committing to a 9B model.
 - **Expected:** ~0.95–1.00.
 
-### Rung 3 — Gemma-2-9b + QLoRA (the contender)
-- `Gemma2ForSequenceClassification`, 3 labels, 4-bit NF4 + LoRA (r=16–64), bf16 compute.
-- Train on DGX Spark; see [v0.2-gemma-qlora-plan.md](v0.2-gemma-qlora-plan.md).
+### Rung 3 — LLM SFT + LoRA (the contender)
+- Label-token readout: softmax over logits at the final token position for tokens A/B/tie.
+- Swap-TTA baked in: average forward + A↔B-swapped predictions per example.
+- **v0.2a (Kaggle T4):** Llama-3.2-3B, pure fp16, single-fold pipeline validation.
+- **v0.3 (Kaggle TPU v5e-8):** Gemma-2-9b-it, pure bf16 (no quantization; 128 GB TPU fits 18 GB model), single fold → all 5 folds. Must select TPU v5e-8 manually in Kaggle UI after push (machine_shape is read-only on CLI push).
+- **v0.3b (DGX Spark GB10):** Gemma-2-9b-it in bf16, all 5 folds, no quantization.
 - **Expected:** ~0.89–0.92 — the score jump that matters.
 
-### Rung 4 — Squeeze
-- **Swap-TTA:** infer with (a,b) and (b,a), swap the two model probs, average → cancels position bias.
-- Ensemble DeBERTa + Gemma; optionally distill a larger teacher.
+### Rung 3b — Reward model zero-shot classifier (v0.4)
+
+Reward models are purpose-trained for human preference prediction — the same task as this
+competition. Use one as a **zero-shot or near-zero-shot classifier** by scoring each
+response independently and converting the scalar delta to class probabilities.
+
+**Approach:**
+1. Load `Skywork-Reward-Llama-3.1-8B-v0.2` (available on Kaggle Models:
+   `quincyqiang/skywork-reward-llama-3.1-8b-v0.2`, ~15 GB — fits on T4).
+2. Score each (prompt, response_a) and (prompt, response_b) pair → `score_a`, `score_b`.
+3. Convert to 3-class probabilities:
+   - `p_a = sigmoid((score_a - score_b) * temperature)`
+   - `p_b = sigmoid((score_b - score_a) * temperature)`
+   - `p_tie`: synthesize from score proximity (e.g. `1 - |p_a - p_b|`), then renormalize
+4. Calibrate tie probability on OOF fold; temperature-tune the sigmoid on OOF.
+
+**Variants:**
+- **v0.4a** (Kaggle T4, zero-shot): `Skywork-Reward-Llama-3.1-8B-v0.2` — no fine-tuning.
+- **v0.4b** (DGX, zero-shot): `Skywork-Reward-Gemma-2-27B` — higher-quality scores, tie
+  calibration same approach.
+- **v0.4c** (optional): add lightweight classification head on top of frozen reward backbone;
+  fine-tune head only on OOF fold to learn tie boundary.
+
+**Why this is interesting:**
+- No SFT training required — pure inference → fast iteration
+- Reward models see (prompt, response) pairs with the correct task framing
+- The 8B version runs on a single T4; the 27B on DGX with no quantization
+
+**Expected:** ~0.90–0.95 zero-shot (reward models have strong priors but tie calibration
+is the gap). May match or exceed v0.3 SFT with good calibration.
+
+### Rung 4 — Knowledge distillation (< 0.82 target)
+Verified from [cite:3]: the winning approach used:
+- **Teacher:** Llama3-70B **or** Qwen2-72B — batch-inference over the full `train.csv`
+  in a 5-fold setup, outputting soft `[p_A, p_B, p_tie]` per row.
+- **Student:** Gemma2-9B per fold, fine-tuned with LoRA using **KL-divergence** loss
+  against teacher's soft targets — not cross-entropy against hard labels.
+- **Ensemble:** average the LoRA *layers* (not predictions) from all 5 folds into one
+  final model before submission.
+- **Why it works:** soft labels carry calibrated confidence (0.75/0.15/0.10 vs
+  0.38/0.35/0.27) rather than binary winner flags — the student inherits the teacher's
+  understanding of preference margins, not just who won.
+- **Hardware:** winners used 8×A100 80GB. DGX Spark GB10 is a single-socket machine —
+  Qwen2-72B teacher inference may require quantization (4-bit) or offloading. Qwen2-72B
+  → Gemma2-9B is the proven winning recipe; Qwen-32B → Qwen-8B (our existing
+  mineral-hr-llm harness) is the practical alternative.
+- **Expected:** < 0.82.
+
+#### DGX Spark hardware constraints (120 GB VRAM)
+
+70B models in bf16 (~140 GB) exceed the 120 GB limit (confirmed: Nemotron-3-Nano-30B-A3B
+needed ~130 GB with swap just to load weights). Practical model options per role:
+
+| Role | Model | VRAM (bf16) | Notes |
+|---|---|---|---|
+| Student (5-fold) | `google/gemma-2-9b-it` | ~18 GB | Fits easily; proven winner backbone |
+| Student (larger) | `google/gemma-2-27b-it` | ~54 GB | Stronger student if runtime allows |
+| Teacher | `Skywork/Skywork-Reward-Gemma-2-27B` | ~54 GB | **Cleanest path** — purpose-built preference reward model; fits in 120 GB with headroom |
+| Teacher (alt) | `google/gemma-2-27b-it` | ~54 GB | General instruction model; weaker preference signal than Skywork |
+| Teacher (alt) | `Qwen/Qwen2.5-72B` in 4-bit | ~36 GB | Fits quantized; soft-label quality degraded vs bf16 |
+
+**Recommended DGX path (cleanest):**
+1. Load `Skywork-Reward-Gemma-2-27B` → batch-infer teacher soft labels over `train.csv`; save to disk.
+2. Unload teacher.
+3. Load `gemma-2-9b-it` → fine-tune with LoRA + KL-divergence loss against saved soft labels (5 folds).
+4. Average LoRA layers across folds → upload adapter to Kaggle for offline inference.
+
+Teacher and student never load simultaneously, so 120 GB is sufficient for each step.
+
+### Rung 5 — Squeeze
+- Ensemble Rung 3 (SFT folds) + Rung 4 (distilled folds) weighted average.
+- Optionally add DeBERTa-v3-large fold-ensemble for cross-encoder diversity.
 - Probability calibration, especially the tie class.
 
 ## Cross-validation
