@@ -88,3 +88,42 @@ run. Training and inference in the same notebook. See
 - [ ] Inference < 9 h on test set
 - [ ] `submission.csv` passes submission checklist
 - [ ] LB score recorded in leaderboard.md
+
+---
+
+## v0.3b-infer
+
+**Kernel id:** `gdataranger/llm-classification-finetuning-v0-3b-infer`
+**Notebook file:** `notebook/v0.3b-infer.ipynb`
+**GPU:** T4 x2 | **Internet:** off
+
+### Context
+
+Offline inference notebook for the DGX-trained Gemma-2-2b-it LoRA adapter (v0.3b).
+Loads base model from Kaggle Models + adapter from private dataset `gdataranger/gemma-2-2b-lora-v03b`.
+Swap-TTA inference on test set → `submission.csv`. Includes fold 0 OOF check to verify adapter quality before submitting.
+
+Initially uses fold 0 adapter only (early LB score while folds 1-4 train). Will be re-run with averaged 5-fold adapter once DGX completes.
+
+### Prerequisites before pushing
+
+- [ ] Fold 0 adapter saved to `output/v0.3b_adapters/fold_0/` on DGX
+- [ ] Adapter uploaded to Kaggle: `kaggle datasets create -p output/v0.3b_adapters/fold_0 --dir-mode zip`
+- [ ] Dataset slug confirmed: `gdataranger/gemma-2-2b-lora-v03b`
+- [ ] `google/gemma-2/transformers/gemma-2-2b-it/1` accepted and attached via Kaggle UI
+
+### Investigation Checklist
+
+- [ ] Notebook runs end-to-end offline (no network calls)
+- [ ] OOF fold 0 log loss < 1.04 (beats v0.1 TF-IDF baseline)
+- [ ] `submission.csv` row count = test set size, no NaN, probs sum to 1
+- [ ] LB score recorded in leaderboard.md
+
+### Push command
+
+```zsh
+zsh scripts/push_notebook.sh v0.3b-infer
+```
+
+Stop auto-run → Accelerator → GPU T4 x2 → Save & Run All.
+(T4 x2 has no confirmed `machine_shape` metadata key — must be set in UI each time.)

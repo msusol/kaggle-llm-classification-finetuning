@@ -1,0 +1,29 @@
+FROM --platform=linux/arm64 nvcr.io/nvidia/pytorch:26.05-py3
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    HF_HOME=/workspace/.cache/huggingface
+
+WORKDIR /workspace
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git git-lfs wget curl vim nano build-essential cmake pkg-config unzip zip \
+ && rm -rf /var/lib/apt/lists/*
+
+RUN python -m pip install --upgrade pip setuptools wheel packaging
+
+# Essential training dependencies
+RUN pip install \
+    "transformers>=4.46.0" \
+    "datasets>=3.2.0" \
+    "accelerate>=1.3.0" \
+    "peft>=0.19.1" \
+    "trl>=0.15.2" \
+    "scikit-learn" \
+    "pandas" \
+    "tqdm"
+
+RUN mkdir -p /workspace/data /workspace/output /workspace/.cache/huggingface
+
+CMD ["/bin/bash"]

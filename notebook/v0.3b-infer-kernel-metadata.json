@@ -1,0 +1,19 @@
+{
+  "id": "gdataranger/llm-classification-finetuning-v0-3b-infer",
+  "title": "LLM Classification Finetuning — v0.3b Inference",
+  "code_file": "v0.3b-infer.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": false,
+  "dataset_sources": [
+    "gdataranger/gemma-2-2b-lora-v03b"
+  ],
+  "competition_sources": [
+    "llm-classification-finetuning"
+  ],
+  "model_sources": [
+    "google/gemma-2/transformers/gemma-2-2b-it/1"
+  ]
+}
