@@ -1,0 +1,17 @@
+{
+  "id": "gdataranger/llm-classification-finetuning-v0-4a-reward",
+  "title": "LLM Classification Finetuning — v0.4a Reward Zero-Shot",
+  "code_file": "v0.4a-reward-zeroshot.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_internet": false,
+  "dataset_sources": [],
+  "competition_sources": [
+    "llm-classification-finetuning"
+  ],
+  "model_sources": [
+    "shelterw/skywork/Transformers/skywork-reward-llama-3.1-8b-v0.2/1"
+  ]
+}

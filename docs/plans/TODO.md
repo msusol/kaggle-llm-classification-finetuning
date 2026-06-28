@@ -37,7 +37,7 @@
 - [ ] Record OOF + LB in leaderboard.md
 
 ### v0.4 — Reward model zero-shot (Skywork-Reward-Llama-3.1-8B)
-- [ ] Attach `quincyqiang/skywork-reward-llama-3.1-8b-v0.2` via Kaggle UI
+- [ ] Attach `shelterw/skywork/Transformers/skywork-reward-llama-3.1-8b-v0.2/1` via Kaggle UI (Apache 2.0, no gate)
 - [ ] Score response_a and response_b independently → compute score delta
 - [ ] Synthesize tie probability from score proximity; calibrate temperature + tie_weight on OOF
 - [ ] Record OOF log loss vs v0.3; apply decision gate (see v0.4 plan)
